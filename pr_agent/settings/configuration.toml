@@ -113,7 +113,7 @@ enable_help_text=false
 enable_help_comment=false
 enable_pr_diagram=true # adds a section with a diagram of the PR changes
 # describe as comment
-publish_description_as_comment=false
+publish_description_as_comment=true
 publish_description_as_comment_persistent=true
 ## changes walkthrough section
 enable_semantic_files_types=true
@@ -278,7 +278,7 @@ push_commands = [
 url = "http://gitlab.camera360.com"
 expand_submodule_diffs = false
 pr_commands = [
-    "/describe --pr_description.final_update_message=false",
+    #"/describe --pr_description.final_update_message=false",
     "/review",
     #"/improve",
 ]

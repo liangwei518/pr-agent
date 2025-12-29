@@ -99,7 +99,7 @@ class PRDescription:
                                 'config': dict(get_settings().config)}
             get_logger().debug("Relevant configs", artifact=relevant_configs)
             if get_settings().config.publish_output and not get_settings().config.get('is_auto_command', False):
-                self.git_provider.publish_comment("Preparing PR description...", is_temporary=True)
+                self.git_provider.publish_comment("Preparing MR description...", is_temporary=True)
 
             # ticket extraction if exists
             await extract_and_cache_pr_tickets(self.git_provider, self.vars)
@@ -140,12 +140,12 @@ class PRDescription:
                 if isinstance(self.git_provider, GithubProvider):
                     pr_body += ('\n\n___\n\n> <details> <summary>  Need help?</summary><li>Type <code>/help how to ...</code> '
                                 'in the comments thread for any questions about PR-Agent usage.</li><li>Check out the '
-                                '<a href="https://qodo-merge-docs.qodo.ai/usage-guide/">documentation</a> '
+                                '<a href="http://gitlab.camera360.com/help">documentation</a> '
                                 'for more information.</li></details>')
                 else: # gitlab
                     pr_body += ("\n\n___\n\n<details><summary>Need help?</summary>- Type <code>/help how to ...</code> in the comments "
                                 "thread for any questions about PR-Agent usage.<br>- Check out the "
-                                "<a href='https://qodo-merge-docs.qodo.ai/usage-guide/'>documentation</a> for more information.</details>")
+                                "<a href='http://gitlab.camera360.com/help'>documentation</a> for more information.</details>")
             # elif get_settings().pr_description.enable_help_comment:
             #     pr_body += '\n\n___\n\n> 💡 **PR-Agent usage**: Comment `/help "your question"` on any pull request to receive relevant information'
 
@@ -186,7 +186,7 @@ class PRDescription:
                         latest_commit_url = self.git_provider.get_latest_commit_url()
                         if latest_commit_url:
                             pr_url = self.git_provider.get_pr_url()
-                            update_comment = f"**[PR Description]({pr_url})** updated to latest commit ({latest_commit_url})"
+                            update_comment = f"**[MR Description]({pr_url})** updated to latest commit ({latest_commit_url})"
                             self.git_provider.publish_comment(update_comment)
                 self.git_provider.remove_initial_comment()
             else:
@@ -577,7 +577,7 @@ class PRDescription:
         pr_file_changes = []
         for idx, (key, value) in enumerate(self.data.items()):
             if key == 'changes_diagram':
-                pr_body += f"### {PRDescriptionHeader.DIAGRAM_WALKTHROUGH.value}\n\n"
+                pr_body += f"### 图表流程\n\n"
                 pr_body += f"{value}\n\n"
                 continue
             if key == 'pr_files':
@@ -585,7 +585,7 @@ class PRDescription:
             else:
                 key_publish = key.rstrip(':').replace("_", " ").capitalize()
                 if key_publish == "Type":
-                    key_publish = "PR Type"
+                    key_publish = "MR 类型"
                 # elif key_publish == "Description":
                 #     key_publish = "PR Description"
                 pr_body += f"### **{key_publish}**\n"
@@ -604,7 +604,7 @@ class PRDescription:
                     initial_status = " open"
                 else:
                     initial_status = ""
-                changes_walkthrough = f"<details{initial_status}> <summary><h3> {PRDescriptionHeader.FILE_WALKTHROUGH.value}</h3></summary>\n\n"
+                changes_walkthrough = f"<details{initial_status}> <summary><h3> 文件变更导览</h3></summary>\n\n"
                 changes_walkthrough += f"{changes_walkthrough_table}\n\n"
                 changes_walkthrough += "</details>\n\n"
             elif key.lower().strip() == 'description':

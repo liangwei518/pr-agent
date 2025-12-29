@@ -29,8 +29,8 @@ dynamic = ["dependencies"]
 dependencies = { file = ["requirements.txt"] }
 
 [project.urls]
-"Homepage" = "https://github.com/qodo-ai/pr-agent"
-"Documentation" = "https://qodo-merge-docs.qodo.ai/"
+"Homepage" = "http://gitlab.camera360.com/help"
+"Documentation" = "http://gitlab.camera360.com/help"
 
 [tool.setuptools]
 include-package-data = true
