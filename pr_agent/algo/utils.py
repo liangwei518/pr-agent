@@ -59,8 +59,8 @@ class TodoItem(TypedDict):
 
 
 class PRReviewHeader(str, Enum):
-    REGULAR = "## PR Reviewer Guide"
-    INCREMENTAL = "## Incremental PR Reviewer Guide"
+    REGULAR = "## MR 审查指南"
+    INCREMENTAL = "## 增量 MR 审查指南"
 
 
 class ReasoningEffort(str, Enum):
@@ -151,6 +151,23 @@ def convert_to_markdown_v2(output_data: dict,
         "Contribution time cost estimate": "⏳",
         "Ticket compliance check": "🎫",
     }
+    
+    # 中文本地化映射
+    i18n_zh = {
+        "Estimated effort to review": "评估 Review 所需工作量",
+        "No relevant tests": "无相关测试",
+        "PR contains tests": "MR 包含测试",
+        "Security concerns": "安全问题",
+        "No security concerns identified": "未发现安全问题",
+        "No major issues detected": "未检测到重大问题",
+        "Recommended focus areas for review": "建议重点审查区域",
+        "No TODO sections": "无 TODO 项",
+        "TODO sections": "TODO 项",
+        "Multiple PR themes": "多个 PR 主题",
+        "No multiple PR themes": "无多个 MR 主题",
+        "Ticket compliance analysis": "工单合规分析",
+        "Contribution time estimate": "贡献时间估算",
+    }
     markdown_text = ""
     if not incremental_review:
         markdown_text += f"{PRReviewHeader.REGULAR.value} 🔍\n\n"
@@ -174,7 +191,7 @@ def convert_to_markdown_v2(output_data: dict,
         key_nice = key.replace('_', ' ').capitalize()
         emoji = emojis.get(key_nice, "")
         if 'Estimated effort to review' in key_nice:
-            key_nice = 'Estimated effort to review'
+            key_nice = i18n_zh.get('Estimated effort to review', 'Estimated effort to review')
             value = str(value).strip()
             if value.isnumeric():
                 value_int = int(value)
@@ -197,58 +214,59 @@ def convert_to_markdown_v2(output_data: dict,
             if gfm_supported:
                 markdown_text += f"<tr><td>"
                 if is_value_no(value):
-                    markdown_text += f"{emoji}&nbsp;<strong>No relevant tests</strong>"
+                    markdown_text += f"{emoji}&nbsp;<strong>{i18n_zh.get('No relevant tests', 'No relevant tests')}</strong>"
                 else:
-                    markdown_text += f"{emoji}&nbsp;<strong>PR contains tests</strong>"
+                    markdown_text += f"{emoji}&nbsp;<strong>{i18n_zh.get('PR contains tests', 'PR contains tests')}</strong>"
                 markdown_text += f"</td></tr>\n"
             else:
                 if is_value_no(value):
-                    markdown_text += f'### {emoji} No relevant tests\n\n'
+                    markdown_text += f"### {emoji} {i18n_zh.get('No relevant tests', 'No relevant tests')}\n\n"
                 else:
-                    markdown_text += f"### {emoji} PR contains tests\n\n"
+                    markdown_text += f"### {emoji} {i18n_zh.get('PR contains tests', 'PR contains tests')}\n\n"
         elif 'ticket compliance check' in key_nice.lower():
             markdown_text = ticket_markdown_logic(emoji, markdown_text, value, gfm_supported)
         elif 'contribution time cost estimate' in key_nice.lower():
+            time_estimate_label = i18n_zh.get('Contribution time estimate', 'Contribution time estimate')
             if gfm_supported:
-                markdown_text += f"<tr><td>{emoji}&nbsp;<strong>Contribution time estimate</strong> (best, average, worst case): "
-                markdown_text += f"{value['best_case'].replace('m', ' minutes')} | {value['average_case'].replace('m', ' minutes')} | {value['worst_case'].replace('m', ' minutes')}"
+                markdown_text += f"<tr><td>{emoji}&nbsp;<strong>{time_estimate_label}</strong> (最佳, 平均, 最差情况): "
+                markdown_text += f"{value['best_case'].replace('m', ' 分钟')} | {value['average_case'].replace('m', ' 分钟')} | {value['worst_case'].replace('m', ' 分钟')}"
                 markdown_text += f"</td></tr>\n"
             else:
-                markdown_text += f"### {emoji} Contribution time estimate (best, average, worst case): "
-                markdown_text += f"{value['best_case'].replace('m', ' minutes')} | {value['average_case'].replace('m', ' minutes')} | {value['worst_case'].replace('m', ' minutes')}\n\n"
+                markdown_text += f"### {emoji} {time_estimate_label} (最佳, 平均, 最差情况): "
+                markdown_text += f"{value['best_case'].replace('m', ' 分钟')} | {value['average_case'].replace('m', ' 分钟')} | {value['worst_case'].replace('m', ' 分钟')}\n\n"
         elif 'security concerns' in key_nice.lower():
             if gfm_supported:
                 markdown_text += f"<tr><td>"
                 if is_value_no(value):
-                    markdown_text += f"{emoji}&nbsp;<strong>No security concerns identified</strong>"
+                    markdown_text += f"{emoji}&nbsp;<strong>{i18n_zh.get('No security concerns identified', 'No security concerns identified')}</strong>"
                 else:
-                    markdown_text += f"{emoji}&nbsp;<strong>Security concerns</strong><br><br>\n\n"
+                    markdown_text += f"{emoji}&nbsp;<strong>{i18n_zh.get('Security concerns', 'Security concerns')}</strong><br><br>\n\n"
                     value = emphasize_header(value.strip())
                     markdown_text += f"{value}"
                 markdown_text += f"</td></tr>\n"
             else:
                 if is_value_no(value):
-                    markdown_text += f'### {emoji} No security concerns identified\n\n'
+                    markdown_text += f"### {emoji} {i18n_zh.get('No security concerns identified', 'No security concerns identified')}\n\n"
                 else:
-                    markdown_text += f"### {emoji} Security concerns\n\n"
+                    markdown_text += f"### {emoji} {i18n_zh.get('Security concerns', 'Security concerns')}\n\n"
                     value = emphasize_header(value.strip(), only_markdown=True)
                     markdown_text += f"{value}\n\n"
         elif 'todo sections' in key_nice.lower():
             if gfm_supported:
                 markdown_text += "<tr><td>"
                 if is_value_no(value):
-                    markdown_text += f"✅&nbsp;<strong>No TODO sections</strong>"
+                    markdown_text += f"✅&nbsp;<strong>{i18n_zh.get('No TODO sections', 'No TODO sections')}</strong>"
                 else:
                     markdown_todo_items = format_todo_items(value, git_provider, gfm_supported)
-                    markdown_text += f"{emoji}&nbsp;<strong>TODO sections</strong>\n<br><br>\n"
+                    markdown_text += f"{emoji}&nbsp;<strong>{i18n_zh.get('TODO sections', 'TODO sections')}</strong>\n<br><br>\n"
                     markdown_text += markdown_todo_items
                 markdown_text += "</td></tr>\n"
             else:
                 if is_value_no(value):
-                    markdown_text += f"### ✅ No TODO sections\n\n"
+                    markdown_text += f"### ✅ {i18n_zh.get('No TODO sections', 'No TODO sections')}\n\n"
                 else:
                     markdown_todo_items = format_todo_items(value, git_provider, gfm_supported)
-                    markdown_text += f"### {emoji} TODO sections\n\n"
+                    markdown_text += f"### {emoji} {i18n_zh.get('TODO sections', 'TODO sections')}\n\n"
                     markdown_text += markdown_todo_items
         elif 'can be split' in key_nice.lower():
             if gfm_supported:
@@ -260,18 +278,18 @@ def convert_to_markdown_v2(output_data: dict,
             if is_value_no(value):
                 if gfm_supported:
                     markdown_text += f"<tr><td>"
-                    markdown_text += f"{emoji}&nbsp;<strong>No major issues detected</strong>"
+                    markdown_text += f"{emoji}&nbsp;<strong>{i18n_zh.get('No major issues detected', 'No major issues detected')}</strong>"
                     markdown_text += f"</td></tr>\n"
                 else:
-                    markdown_text += f"### {emoji} No major issues detected\n\n"
+                    markdown_text += f"### {emoji} {i18n_zh.get('No major issues detected', 'No major issues detected')}\n\n"
             else:
                 issues = value
                 if gfm_supported:
                     markdown_text += f"<tr><td>"
                     # markdown_text += f"{emoji}&nbsp;<strong>{key_nice}</strong><br><br>\n\n"
-                    markdown_text += f"{emoji}&nbsp;<strong>Recommended focus areas for review</strong><br><br>\n\n"
+                    markdown_text += f"{emoji}&nbsp;<strong>{i18n_zh.get('Recommended focus areas for review', 'Recommended focus areas for review')}</strong><br><br>\n\n"
                 else:
-                    markdown_text += f"### {emoji} Recommended focus areas for review\n\n#### \n"
+                    markdown_text += f"### {emoji} {i18n_zh.get('Recommended focus areas for review', 'Recommended focus areas for review')}\n\n#### \n"
                 for i, issue in enumerate(issues):
                     try:
                         if not issue or not isinstance(issue, dict):
@@ -449,11 +467,11 @@ def ticket_markdown_logic(emoji, markdown_text, value, gfm_supported) -> str:
         # editing table row for ticket compliance analysis
         if gfm_supported:
             markdown_text += f"<tr><td>\n\n"
-            markdown_text += f"**{emoji} Ticket compliance analysis {compliance_emoji}**\n\n"
+            markdown_text += f"**{emoji} 工单合规分析 {compliance_emoji}**\n\n"
             markdown_text += ticket_compliance_str
             markdown_text += f"</td></tr>\n"
         else:
-            markdown_text += f"### {emoji} Ticket compliance analysis {compliance_emoji}\n\n"
+            markdown_text += f"### {emoji} 工单合规分析 {compliance_emoji}\n\n"
             markdown_text += ticket_compliance_str + "\n\n"
 
     return markdown_text
@@ -462,13 +480,13 @@ def ticket_markdown_logic(emoji, markdown_text, value, gfm_supported) -> str:
 def process_can_be_split(emoji, value):
     try:
         # key_nice = "Can this PR be split?"
-        key_nice = "Multiple PR themes"
+        key_nice = "多个 MR 主题"
         markdown_text = ""
         if not value or isinstance(value, list) and len(value) == 1:
             value = "No"
             # markdown_text += f"<tr><td> {emoji}&nbsp;<strong>{key_nice}</strong></td><td>\n\n{value}\n\n</td></tr>\n"
             # markdown_text += f"### {emoji} No multiple PR themes\n\n"
-            markdown_text += f"{emoji} <strong>No multiple PR themes</strong>\n\n"
+            markdown_text += f"{emoji} <strong>无多个 MR 主题</strong>\n\n"
         else:
             markdown_text += f"{emoji} <strong>{key_nice}</strong><br><br>\n\n"
             for i, split in enumerate(value):

@@ -6,12 +6,12 @@
 
 [config]
 # models
-model="gpt-5-2025-08-07"
-fallback_models=["o4-mini"]
+model="deepseek/deepseek-chat"
+fallback_models=["deepseek/deepseek-chat"]
 #model_reasoning="o4-mini" # dedicated reasoning model for self-reflection
 #model_weak="gpt-4o" # optional, a weaker model to use for some easier tasks
 # CLI
-git_provider="github"
+git_provider="gitlab"
 publish_output=true
 publish_output_progress=true
 verbosity_level=0 # 0,1,2
@@ -26,11 +26,11 @@ disable_auto_feedback = false
 ai_timeout=120 # 2minutes
 skip_keys = []
 custom_reasoning_model = false # when true, disables system messages and temperature controls for models that don't support chat-style inputs
-response_language="en-US" # Language locales code for PR responses in ISO 3166 and ISO 639 format (e.g., "en-US", "it-IT", "zh-CN", ...)
+response_language="zh-CN" # Language locales code for PR responses in ISO 3166 and ISO 639 format (e.g., "en-US", "it-IT", "zh-CN", ...)
 # token limits
-max_description_tokens = 500
-max_commits_tokens = 500
-max_model_tokens = 32000 # Limits the maximum number of tokens that can be used by any model, regardless of the model's default capabilities.
+max_description_tokens = 1000
+max_commits_tokens = 1000
+max_model_tokens = 64000 # Limits the maximum number of tokens that can be used by any model, regardless of the model's default capabilities.
 custom_model_max_tokens=-1 # for models not in the default list
 model_token_count_estimate_factor=0.3 # factor to increase the token count estimate, in order to reduce likelihood of model failure due to too many tokens - applicable only when requesting an accurate estimate.
 # patch extension logic
@@ -54,8 +54,8 @@ add_repo_metadata=false # if true, will try to add metadata from files like 'AGE
 add_repo_metadata_file_list =["AGENTS.MD", "CLAUDE.MD", "QODO.MD"]
 # ignore logic
 ignore_pr_title = ["^\\[Auto\\]", "^Auto"] # a list of regular expressions to match against the PR title to ignore the PR agent
-ignore_pr_target_branches = [] # a list of regular expressions of target branches to ignore from PR agent when an PR is created
-ignore_pr_source_branches = [] # a list of regular expressions of source branches to ignore from PR agent when an PR is created
+ignore_pr_target_branches = ["main"] # a list of regular expressions of target branches to ignore from PR agent when an PR is created
+ignore_pr_source_branches = ["main"] # a list of regular expressions of source branches to ignore from PR agent when an PR is created
 ignore_pr_labels = [] # labels to ignore from PR agent when an PR is created
 ignore_pr_authors = [] # authors to ignore from PR agent when an PR is created
 ignore_repositories = [] # a list of regular expressions of repository full names (e.g. "org/repo") to ignore from PR agent processing
@@ -78,7 +78,7 @@ extended_thinking_max_output_tokens = 4096
 [pr_reviewer] # /review #
 # enable/disable features
 require_score_review=false
-require_tests_review=true
+require_tests_review=false
 require_estimate_effort_to_review=true
 require_can_be_split_review=false
 require_security_review=true
@@ -275,12 +275,12 @@ push_commands = [
 ]
 
 [gitlab]
-url = "https://gitlab.com"
+url = "http://gitlab.camera360.com"
 expand_submodule_diffs = false
 pr_commands = [
     "/describe --pr_description.final_update_message=false",
     "/review",
-    "/improve",
+    #"/improve",
 ]
 handle_push_trigger = false
 push_commands = [

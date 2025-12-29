@@ -157,7 +157,7 @@ class PRCodeSuggestions:
                     if get_settings().pr_code_suggestions.persistent_comment: # true by default
                         self.publish_persistent_comment_with_history(self.git_provider,
                                                                      pr_body,
-                                                                     initial_header="## PR Code Suggestions ✨",
+                                                                     initial_header="## MR 代码建议 ✨",
                                                                      update_header=True,
                                                                      name="suggestions",
                                                                      final_update_message=False,
@@ -208,7 +208,7 @@ class PRCodeSuggestions:
         return pr_body
 
     async def publish_no_suggestions(self):
-        pr_body = "## PR Code Suggestions ✨\n\nNo code suggestions found for the PR."
+        pr_body = "## PR 代码建议 ✨\n\n未找到 PR 代码建议。"
         if (get_settings().config.publish_output and
                 get_settings().pr_code_suggestions.get('publish_output_no_suggestions', True)):
             get_logger().warning('No code suggestions found for the PR.')
@@ -771,7 +771,7 @@ class PRCodeSuggestions:
 
     def generate_summarized_suggestions(self, data: Dict) -> str:
         try:
-            pr_body = "## PR Code Suggestions ✨\n\n"
+            pr_body = "## MR 代码建议 ✨\n\n"
 
             if len(data.get('code_suggestions', [])) == 0:
                 pr_body += "No suggestions found to improve this PR."
